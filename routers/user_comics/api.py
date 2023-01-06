@@ -9,6 +9,8 @@ class AddToLayaway(BaseModel):
     id_comic: int
     title: str
     image: str
+    on_sale_date: str
+    user_id: str | None = None
 
 
 class Layaway(BaseModel):
@@ -28,6 +30,7 @@ async def add_to_layaway(user_id: str, layaway: Layaway):
     elif not user_db.get("is_active"):
         raise HTTPException(detail="Usuario no activo", status_code=400)
     else:
-        layaway.user_id = user_id
-        my_collection_layaway_comics.insert_one(layaway.dict())
+        for row in layaway.list_layaway:
+            row.user_id = user_id
+            my_collection_layaway_comics.insert_one(row.dict())
         return {"status": "Sus comics fueron apartados exitosamente"}
